@@ -3,17 +3,19 @@ use chrono::prelude::*;
 use jsonwebtoken::{encode, EncodingKey, Header};
 use serde::{Deserialize, Serialize};
 
-pub fn calculate_jwt_with_username(username: &str, secret: &[u8]) -> Result<String> {
+pub fn calculate_jwt_with_username(userid: &str, username: &str, secret: &[u8]) -> Result<String> {
     #[derive(Debug, Serialize, Deserialize)]
     struct Claims<'a> {
-        iss: &'a str,
+        sub: &'a str, // (subject): Subject of the JWT (the user)
+        name: &'a str,
         iat: i64,
     }
 
     let local: DateTime<Local> = Local::now();
 
     let jwt_claim = Claims {
-        iss: username,
+        sub: userid,
+        name: username,
         iat: local.timestamp(),
     };
 
