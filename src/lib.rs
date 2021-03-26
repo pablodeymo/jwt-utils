@@ -8,6 +8,7 @@ struct Claims<'a> {
     sub: &'a str, // (subject): Subject of the JWT (the user)
     name: &'a str,
     iat: i64,
+    exp: usize,
 }
 
 pub fn encode_jwt_with_username(userid: &str, username: &str, secret: &[u8]) -> Result<String> {
@@ -17,6 +18,7 @@ pub fn encode_jwt_with_username(userid: &str, username: &str, secret: &[u8]) -> 
         sub: userid,
         name: username,
         iat: local.timestamp(),
+        exp: 10000000000,
     };
 
     // jwt_claim is a struct that implements Serialize
