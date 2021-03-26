@@ -36,11 +36,11 @@ pub struct DeserializedClaims {
     iat: i64,
 }
 
-pub fn decode_jwt_token(token: &str, secret: &str) -> Result<DeserializedClaims> {
+pub fn decode_jwt_token(token: &str, secret: &[u8]) -> Result<DeserializedClaims> {
     // Claims is a struct that implements Deserialize
     decode::<DeserializedClaims>(
         &token,
-        &DecodingKey::from_secret(secret.as_bytes()),
+        &DecodingKey::from_secret(secret),
         &Validation::new(Algorithm::HS256),
     )
     .map(|v| v.claims)
