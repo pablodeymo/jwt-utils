@@ -33,8 +33,8 @@ pub fn encode_jwt_with_username(userid: &str, username: &str, secret: &[u8]) -> 
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DeserializedClaims {
-    pub sub: String, // (subject): Subject of the JWT (the user)
-    pub name: String,
+    pub sub: Option<String>, // (subject): Subject of the JWT (the user)
+    pub name: Option<String>,
     pub iat: i64,
 }
 
