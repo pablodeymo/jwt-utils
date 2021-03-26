@@ -1,16 +1,16 @@
 use anyhow::{anyhow, Result};
 use chrono::prelude::*;
-use jsonwebtoken::{encode, EncodingKey, Header};
+use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 
-pub fn calculate_jwt_with_username(userid: &str, username: &str, secret: &[u8]) -> Result<String> {
-    #[derive(Debug, Serialize, Deserialize)]
-    struct Claims<'a> {
-        sub: &'a str, // (subject): Subject of the JWT (the user)
-        name: &'a str,
-        iat: i64,
-    }
+#[derive(Debug, Serialize, Deserialize)]
+struct Claims<'a> {
+    sub: &'a str, // (subject): Subject of the JWT (the user)
+    name: &'a str,
+    iat: i64,
+}
 
+pub fn encode_jwt_with_username(userid: &str, username: &str, secret: &[u8]) -> Result<String> {
     let local: DateTime<Local> = Local::now();
 
     let jwt_claim = Claims {
@@ -29,10 +29,20 @@ pub fn calculate_jwt_with_username(userid: &str, username: &str, secret: &[u8]) 
     .map_err(|e| anyhow!("Error generating JWT. {}", e))
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeserializedClaims {
+    sub: String, // (subject): Subject of the JWT (the user)
+    name: String,
+    iat: i64,
+}
+
+pub fn decode_jwt_token(token: &str, secret: String) -> Result<DeserializedClaims> {
+    // Claims is a struct that implements Deserialize
+    decode::<DeserializedClaims>(
+        &token,
+        &DecodingKey::from_secret(secret.as_bytes()),
+        &Validation::new(Algorithm::HS256),
+    )
+    .map(|v| v.claims)
+    .map_err(|e| anyhow!("Error decoding JWT token. {}", e))
 }
